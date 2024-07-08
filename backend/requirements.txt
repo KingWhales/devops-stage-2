@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+sqlalchemy
+sentry_sdk
+#psycopg2
+psycopg[binary]
+psycopg[pool]
+flask
