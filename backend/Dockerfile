@@ -1,32 +1,20 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12.2-slim
+# Use the official Python image
+FROM python:3.10
 
-# Install dependencies for psycopg2-binary
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Install poetry
-RUN pip install poetry
+# Copy requirements.txt
+COPY requirements.txt /app/requirements.txt
 
-# Copy the requirements file into the container at /app
-COPY requirements.txt .
-
-# Install any needed packages specified in requirements.txt
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code into the container
-COPY . .
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Expose the port uvicorn will listen on
-EXPOSE 80
-
-# Set environment variables (if necessary)
-ENV NAME World
+# Expose port 8000
+EXPOSE 8000
 
 # Command to run the application
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

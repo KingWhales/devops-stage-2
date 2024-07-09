@@ -1,37 +1,36 @@
 version: '3'
 
 services:
-
   frontend:
+    image: react-frontend
+    container_name: react_frontend
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.frontend
     ports:
-      - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://backend:8000
-    depends_on:
-      - backend
+      - "3000:80"
 
   backend:
+    image: fastapi-backend
+    container_name: fastapi_backend
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      - POSTGRES_USER=your_postgres_user
+      - POSTGRES_PASSWORD=your_postgres_password
+      - POSTGRES_DB=your_postgres_db
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgres://user:password@db:5432/myapp
-    depends_on:
-      - db
 
-  db:
-    image: postgres:12
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx_proxy_manager
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "81:81"
+      - "443:443"
     volumes:
-      - db-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=myapp
-
-volumes:
-  db-data:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
